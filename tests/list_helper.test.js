@@ -1,4 +1,5 @@
-import { dummy, favoriteBlog, totalLikes } from "../utilities/list_helper.js"
+import { dummy, favoriteBlog, mostBlogs, mostLikes, totalLikes } from "../utilities/list_helper.js"
+
 test('dummy returns one', () => {
     const blogs = []
 
@@ -85,8 +86,6 @@ describe('total likes', () => {
 
         expect(result).toBe(totalComments)
     })
-
-
     test('return the blog with most likes', () => {
         const result = favoriteBlog(biggerList)
 
@@ -94,6 +93,22 @@ describe('total likes', () => {
             author: "Edsger W. Dijkstra",
             likes: 12,
             title: "Canonical string reduction",
+        })
+    })
+    test('return the author with most blogs', () => {
+        const result = mostBlogs(biggerList)
+
+        expect(result).toEqual({
+            author: "Robert C. Martin",
+            blogs: 3
+        })
+    })
+    test('return the author with most likes', () => {
+        const result = mostLikes(biggerList)
+
+        expect(result).toEqual({
+            author: "Edsger W. Dijkstra",
+            likes: 17
         })
     })
 })
