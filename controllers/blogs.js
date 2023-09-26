@@ -3,20 +3,25 @@ import { Blog } from "../models/blog.js";
 
 export const blogsRouter = Router()
 
-blogsRouter.get('/', (request, response) => {
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
-})
+blogsRouter.get('/', async (request, response) => {
 
-blogsRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
+    try {
+        const blogs = await Blog.find({});
+        response.json(blogs);
+    } catch (error) {
+        response.status(404).json(error);
+    }
 
-    blog
-        .save()
-        .then(result => {
-            response.status(201).json(result)
-        })
-})
+});
+
+blogsRouter.post('/', async (request, response) => {
+
+    try {
+        const blog = new Blog(request.body);
+        const result = await blog.save();
+        response.status(201).json(result);
+
+    } catch (error) {
+        response.status(400).json(error);
+    }
+});
