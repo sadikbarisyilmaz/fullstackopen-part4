@@ -5,6 +5,7 @@ import { hash } from 'bcrypt'
 import { usersInDb } from './test_helper.js'
 import { User } from '../models/user.js'
 
+
 const api = supertest(app)
 
 describe('when there is initially one user in db', () => {

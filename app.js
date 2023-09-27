@@ -6,6 +6,7 @@ import { usersRouter } from './controllers/users.js'
 import { errorHandler, requestLogger, unknownEndpoint } from './utilities/middleware.js'
 import { MONGODB_URI } from "./utilities/config.js"
 import { errorlogger, info } from './utilities/logger.js'
+import { loginRouter } from './controllers/login.js'
 
 connect(MONGODB_URI).then(() => {
     info("Connected to MongoDB");
@@ -20,6 +21,7 @@ app.use(requestLogger)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/login', loginRouter)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
