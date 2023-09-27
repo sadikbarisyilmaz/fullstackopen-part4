@@ -1,9 +1,9 @@
-import pkg from 'jsonwebtoken';
-const { sign } = pkg;
 import { compare } from 'bcrypt'
 import { User } from '../models/user.js'
 import { Router } from "express";
 import "dotenv/config";
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
 
 export const loginRouter = Router()
 

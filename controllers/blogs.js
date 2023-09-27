@@ -1,9 +1,20 @@
 import { Router } from "express";
+import "dotenv/config";
 import { Blog } from "../models/blog.js";
 import "express-async-errors"
 import { User } from "../models/user.js";
+import pkg from 'jsonwebtoken';
+const { verify } = pkg;
 
 export const blogsRouter = Router()
+
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.startsWith('Bearer ')) {
+        return authorization.replace('Bearer ', '')
+    }
+    return null
+}
 
 blogsRouter.get('/', async (request, response) => {
 
@@ -14,9 +25,14 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
     const body = request.body
-    console.log("body.userId: ", body.userId);
-    const user = await User.findById(body.userId)
-    console.log("User: ", user);
+
+    const decodedToken = verify(getTokenFrom(request), process.env.SECRET)
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
+
     const blog = new Blog({
         title: body.title,
         author: body.author,

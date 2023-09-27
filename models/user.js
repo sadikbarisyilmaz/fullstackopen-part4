@@ -4,11 +4,17 @@ import uniqueValidator from "mongoose-unique-validator"
 const userSchema = new Schema({
     username: {
         type: String,
+        minlength: 3,
         required: true,
         unique: true
     },
     name: String,
-    passwordHash: String,
+    passwordHash: {
+        type: String,
+        minlength: 3,
+        required: true,
+
+    },
     blogs: [
         {
             type: Schema.Types.ObjectId,
