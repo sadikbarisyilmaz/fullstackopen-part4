@@ -4,7 +4,7 @@ export const info = (...params) => {
     }
 }
 
-export const error = (...params) => {
+export const errorlogger = (...params) => {
     if (process.env.NODE_ENV !== 'test') {
         console.error(...params)
     }

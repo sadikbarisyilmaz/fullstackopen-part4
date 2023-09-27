@@ -1,4 +1,4 @@
-import { error, info } from "./logger.js";
+import { errorlogger, info } from "./logger.js";
 
 export const requestLogger = (request, response, next) => {
     info('Method:', request.method)
@@ -13,7 +13,7 @@ export const unknownEndpoint = (request, response) => {
 }
 
 export const errorHandler = (error, request, response, next) => {
-    logger.error(error.message)
+    errorlogger(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
