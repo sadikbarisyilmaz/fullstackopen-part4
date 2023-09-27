@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { Blog } from "../models/blog.js";
 import "express-async-errors"
-import { errorHandler } from "../utilities/middleware.js";
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (request, response) => {
@@ -29,8 +28,6 @@ blogsRouter.put('/:id', async (request, response) => {
         url: body.url,
         likes: body.likes,
     }
-
-    console.log(blog);
 
     const result = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
     response.status(201).json(result);
