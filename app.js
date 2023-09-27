@@ -2,6 +2,7 @@ import express, { json } from 'express'
 import cors from 'cors'
 import { connect } from 'mongoose'
 import { blogsRouter } from './controllers/blogs.js'
+import { usersRouter } from './controllers/users.js'
 import { errorHandler, requestLogger, unknownEndpoint } from './utilities/middleware.js'
 import { MONGODB_URI } from "./utilities/config.js"
 import { errorlogger, info } from './utilities/logger.js'
@@ -18,6 +19,7 @@ app.use(json())
 app.use(requestLogger)
 
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

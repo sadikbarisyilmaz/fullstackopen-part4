@@ -1,21 +1,35 @@
 import { Router } from "express";
 import { Blog } from "../models/blog.js";
 import "express-async-errors"
+import { User } from "../models/user.js";
+
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (request, response) => {
 
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs);
 
 });
 
 blogsRouter.post('/', async (request, response) => {
+    const body = request.body
+    console.log("body.userId: ", body.userId);
+    const user = await User.findById(body.userId)
+    console.log("User: ", user);
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes,
+        user: user.id
+    })
 
-    const blog = new Blog(request.body);
+    const savedBlog = await blog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
 
-    const result = await blog.save()
-    response.status(201).json(result);
+    response.status(201).json(savedBlog);
 
 });
 
