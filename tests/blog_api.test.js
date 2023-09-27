@@ -111,23 +111,40 @@ test('blog without title or url is not added', async () => {
 //     expect(resultBlog.body).toEqual(blogToView)
 // }, 1000000)
 
-// test('a blog can be deleted', async () => {
+test('a blog can be deleted', async () => {
+    const blogsAtStart = await blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await blogsInDb()
+
+    expect(blogsAtEnd).toHaveLength(
+        initialBlogs.length - 1
+    )
+
+    const contents = blogsAtEnd.map(r => r.title)
+    expect(contents).not.toContain(blogToDelete.title)
+}, 1000000)
+
+// test("a blogs like property can be updated", async () => {
 //     const blogsAtStart = await blogsInDb()
-//     const blogToDelete = blogsAtStart[0]
+//     const blogToUpdate = blogsAtStart[0]
+
+//     console.log(blogToUpdate);
 
 //     await api
-//         .delete(`/api/blogs/${blogToDelete.id}`)
-//         .expect(204)
+//         .put(`/api/blogs/${blogToUpdate.id}`, { title: "Blog0", author: "Blog0", url: "Blog0", likes: 100 })
+//         .expect(201)
 
 //     const blogsAtEnd = await blogsInDb()
 
-//     expect(blogsAtEnd).toHaveLength(
-//         initialBlogs.length - 1
-//     )
+//     expect(blogsAtEnd[0].likes).toEqual(100)
 
-//     const contents = blogsAtEnd.map(r => r.title)
-//     expect(contents).not.toContain(blogToDelete.title)
-// }, 1000000)
+// })
+
 
 afterAll(async () => {
     await disconnect()
