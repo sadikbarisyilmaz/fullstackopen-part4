@@ -1,5 +1,9 @@
 import { Blog } from "../models/blog"
 import { User } from "../models/user"
+import supertest from 'supertest'
+import { app } from '../app.js'
+
+const api = supertest(app)
 
 export const initialBlogs = [
     { title: "Blog0", author: "Blog0", url: "Blog0", likes: 0 },
@@ -24,3 +28,18 @@ export const usersInDb = async () => {
     return users.map(u => u.toJSON())
 }
 
+export const testUserToken = async () => {
+    const AuthUser = {
+        username: "root",
+        password: "sekret",
+    };
+
+    const AuthUserResult = await api
+        .post("/login")
+        .send(AuthUser)
+        .expect(200);
+
+    const token = AuthUserResult.body.token;
+
+    return token
+}

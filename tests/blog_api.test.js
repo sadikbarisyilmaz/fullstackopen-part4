@@ -2,16 +2,21 @@ import { disconnect } from 'mongoose'
 import supertest from 'supertest'
 import { app } from '../app.js'
 import { Blog } from '../models/blog.js'
-import { blogsInDb, initialBlogs, nonExistingId } from './test_helper.js'
+import { blogsInDb, initialBlogs, nonExistingId, testUserToken } from './test_helper.js'
 
 const api = supertest(app)
+const token = await testUserToken()
 
 beforeEach(async () => {
     await Blog.deleteMany({})
 
     for (let blog of initialBlogs) {
-        let blogObject = new Blog(blog)
-        await blogObject.save()
+        await api
+            .post('/api/blogs')
+            .set({ Authorization: `Bearer ${token}` })
+            .send(blog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
     }
 }, 1000000)
 
@@ -42,6 +47,7 @@ describe('POST', () => {
 
         const request = await api
             .post('/api/blogs')
+            .set({ Authorization: `Bearer ${token}` })
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -54,9 +60,10 @@ describe('POST', () => {
             title: 'async/await simplifies making async calls',
             author: "Blog2", url: "Blog2", likes: 2
         }
-
+        const token = await testUserToken()
         await api
             .post('/api/blogs')
+            .set({ Authorization: `Bearer ${token}` })
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -79,6 +86,7 @@ describe('POST', () => {
 
         await api
             .post('/api/blogs')
+            .set({ Authorization: `Bearer ${token}` })
             .send(newBlog)
             .expect(400)
 
@@ -95,6 +103,7 @@ describe('DELETE and PUT', () => {
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set({ Authorization: `Bearer ${token}` })
             .expect(204)
 
         const blogsAtEnd = await blogsInDb()
@@ -105,6 +114,18 @@ describe('DELETE and PUT', () => {
 
         const contents = blogsAtEnd.map(r => r.title)
         expect(contents).not.toContain(blogToDelete.title)
+    }, 1000000)
+
+
+    test('adding a blog fails if a token is not provided', async () => {
+        const blogsAtStart = await blogsInDb()
+        const blogToDelete = blogsAtStart[0]
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .set({ Authorization: `Bearer ` })
+            .expect(401)
+
     }, 1000000)
 
     test("a blogs like property can be updated", async () => {

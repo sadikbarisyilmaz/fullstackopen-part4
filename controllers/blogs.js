@@ -70,7 +70,7 @@ blogsRouter.delete('/:id', async (request, response, next) => {
         response.status(404)
         next()
     }
-
+    console.log(blog.user);
     if (blog.user.toString() === userId) {
 
         await Blog.findByIdAndRemove(request.params.id)
