@@ -8,14 +8,6 @@ const { verify } = pkg;
 
 export const blogsRouter = Router()
 
-const getTokenFrom = request => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.startsWith('Bearer ')) {
-        return authorization.replace('Bearer ', '')
-    }
-    return null
-}
-
 blogsRouter.get('/', async (request, response) => {
 
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -26,12 +18,7 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
     const body = request.body
 
-    const decodedToken = verify(getTokenFrom(request), process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).json({ error: 'token invalid' })
-    }
-    const user = await User.findById(decodedToken.id)
-
+    const user = request.user
 
     const blog = new Blog({
         title: body.title,
@@ -73,9 +60,23 @@ blogsRouter.get('/:id', async (request, response) => {
     }
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', async (request, response, next) => {
+    const userId = request.user.id
 
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    const blog = await Blog.findById(request.params.id)
 
+    //if blog is not found 
+    if (blog === null) {
+        response.status(404)
+        next()
+    }
+
+    if (blog.user.toString() === userId) {
+
+        await Blog.findByIdAndRemove(request.params.id)
+        response.status(204).end("Blog")
+
+    } else {
+        response.status(401).end()
+    }
 })

@@ -13,7 +13,6 @@ const userSchema = new Schema({
         type: String,
         minlength: 3,
         required: true,
-
     },
     blogs: [
         {

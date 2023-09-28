@@ -61,8 +61,27 @@ describe('when there is initially one user in db', () => {
         const usersAtEnd = await usersInDb()
         expect(usersAtEnd).toEqual(usersAtStart)
     }, 1000000)
-}, 100000)
 
+
+    test('user without username property is not added', async () => {
+
+        const usersAtStart = await usersInDb()
+
+        const newUser = {
+            name: "user2",
+            password: "2"
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await usersInDb()
+
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    }, 1000000)
+}, 100000)
 
 
 afterAll(async () => {
